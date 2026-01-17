@@ -27,9 +27,9 @@ export default function Hero() {
       </div>
 
       {/* Main hero - centralizado */}
-      <div className="absolute inset-0 -top-32 flex items-start justify-center pt-8">
+      <div className="absolute inset-0 -top-8 flex items-start justify-center pt-8">
         <div className="relative w-full max-w-5xl">
-          <div className="relative mx-auto" style={{ height: "110vh" }}>
+          <div className="relative mx-auto" style={{ height: "100vh" }}>
             <Image
               src="/me.png"
               alt="Foto"
@@ -46,8 +46,8 @@ export default function Hero() {
       {/* Text + arrow - posicionado absolutamente no canto superior direito */}
       <div className="absolute right-12 top-32 text-right text-white md:right-24">
         <div className="mb-2 text-xl opacity-80">↘</div>
-        <div className="text-2xl">Freelance</div>
-        <div className="text-2xl">Designer & Developer</div>
+        <div className="text-2xl">Freelance &</div>
+        <div className="text-2xl">Backend Developer</div>
       </div>
 
       {/* Big name marquee at bottom */}
