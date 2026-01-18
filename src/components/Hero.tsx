@@ -14,7 +14,7 @@ export default function Hero() {
       </nav>
 
       {/* Left badge */}
-      <div className="pointer-events-none absolute left-0 top-40 pl-2">
+      <div className="pointer-events-none absolute left-0 top-75 pl-2">
         <div className="flex items-center gap-4 rounded-3xl bg-black/30 px-4 py-3 text-white backdrop-blur-sm shadow-xl">
           <div className="leading-tight">
             <div className="text-xs opacity-80">Located in</div>
@@ -44,21 +44,36 @@ export default function Hero() {
       </div>
 
       {/* Text + arrow - posicionado absolutamente no canto superior direito */}
-      <div className="absolute right-12 top-32 text-right text-white md:right-24">
-        <div className="mb-2 text-xl opacity-80">↘</div>
-        <div className="text-2xl">Freelance &</div>
-        <div className="text-2xl">Backend Developer</div>
-      </div>
+      <motion.div 
+        className="absolute right-12 top-32 text-right text-white md:right-24"
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.8, delay: 0.5 }}
+      >
+        <motion.div 
+          className="mb-4 text-6xl font-light"
+          animate={{ y: [0, -4, 0] }}
+          transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+        >
+          ↘
+        </motion.div>
+        <div className="text-5xl font-light leading-tight">
+          <div>Freelance</div>
+          <div>Backend Developer</div>
+        </div>
+      </motion.div>
 
       {/* Big name marquee at bottom */}
       <div className="pointer-events-none absolute bottom-0 left-0 right-0 select-none overflow-hidden">
         <motion.div
           className="whitespace-nowrap"
           initial={{ x: 0 }}
-          animate={{ x: ["0%", "-50%"] }}
-          transition={{ duration: 14, repeat: Infinity, ease: "linear" }}
+          animate={{ x: "-100%" }}
+          transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
         >
-          <span className="px-8 text-[22vw] leading-none tracking-tight text-white/90">Otavio Emanoel</span>
+          <span className="inline-block px-8 text-[22vw] leading-none tracking-tight text-white/90">Otavio Emanoel </span>
+          <span className="inline-block px-8 text-[22vw] leading-none tracking-tight text-white/90">Otavio Emanoel </span>
+          <span className="inline-block px-8 text-[22vw] leading-none tracking-tight text-white/90">Otavio Emanoel </span>
         </motion.div>
       </div>
     </section>
