@@ -1,5 +1,5 @@
 "use client";
-import { motion, useInView } from "framer-motion";
+import { motion, useInView, AnimatePresence } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
 
 const initialLines = [
@@ -66,24 +66,27 @@ const directories: Directory = {
 
 export default function TerminalSection() {
 	const ref = useRef(null);
+	const terminalBoxRef = useRef(null);
 	const isInView = useInView(ref, { once: true, margin: "-100px" });
+	const isTerminalInView = useInView(terminalBoxRef, { once: true, margin: "-50px" });
 	const [visibleLines, setVisibleLines] = useState<number>(0);
 	const [lines, setLines] = useState(initialLines);
 	const [input, setInput] = useState('');
 	const [output, setOutput] = useState<(string | FileItem)[]>([]);
 	const [currentDir, setCurrentDir] = useState('~');
 	const [isNyanCat, setIsNyanCat] = useState(false);
+	const [isTerminalOpen, setIsTerminalOpen] = useState(true);
 	const terminalRef = useRef<HTMLDivElement>(null);
 	const inputRef = useRef<HTMLInputElement>(null);
 
 	useEffect(() => {
-		if (isInView && visibleLines < lines.length) {
+		if (isTerminalInView && isTerminalOpen && visibleLines < lines.length) {
 			const timeout = setTimeout(() => {
 				setVisibleLines((prev) => prev + 1);
 			}, 500);
 			return () => clearTimeout(timeout);
 		}
-	}, [isInView, visibleLines, lines.length]);
+	}, [isTerminalInView, isTerminalOpen, visibleLines, lines.length]);
 
 	// Auto-scroll quando há novo output
 	useEffect(() => {
@@ -111,6 +114,13 @@ export default function TerminalSection() {
 	}, [isNyanCat]);
 
 	const handleInput = (e: React.KeyboardEvent<HTMLInputElement>) => {
+		// Detectar Ctrl+D para fechar terminal
+		if (e.ctrlKey && e.key === 'd') {
+			e.preventDefault();
+			setIsTerminalOpen(false);
+			return;
+		}
+
 		if (e.key === 'Enter') {
 			e.preventDefault();
 			processCommand(input);
@@ -227,9 +237,22 @@ export default function TerminalSection() {
 		} else if (cmd === 'nyancat') {
 			setOutput(prev => [...prev, `$ nyancat`, '']);
 			setIsNyanCat(true);
+		} else if (cmd === 'exit') {
+			setIsTerminalOpen(false);
 		} else {
 			setOutput(prev => [...prev, `command not found: ${cmd}`]);
 		}
+	};
+
+	// Função para reabrir o terminal
+	const reopenTerminal = () => {
+		setIsTerminalOpen(true);
+		setVisibleLines(0);
+		setOutput([]);
+		setCurrentDir('~');
+		setIsNyanCat(false);
+		// Focus no input após reabrir
+		setTimeout(() => inputRef.current?.focus(), 100);
 	};
 
 	// Componente Nyancat com GIF
@@ -297,20 +320,36 @@ export default function TerminalSection() {
 				</motion.div>
 
 				<motion.div 
-					ref={ref}
-					initial={{ opacity: 0, y: 50, scale: 0.95 }}
-					whileInView={{ opacity: 1, y: 0, scale: 1 }}
-					transition={{ duration: 0.8, delay: 0.2 }}
-					className="flex-1 w-full max-w-lg"
-				>
-					<div className="w-full rounded-xl overflow-hidden bg-[#0c0c0c] border border-white/10 shadow-2xl shadow-emerald-900/10">
-						<div className="flex items-center gap-2 px-4 py-3 bg-[#1a1a1a] border-b border-white/5">
-							<div className="w-3 h-3 rounded-full bg-red-500/80" />
-							<div className="w-3 h-3 rounded-full bg-yellow-500/80" />
-							<div className="w-3 h-3 rounded-full bg-emerald-500/80" />
-							<div className="ml-auto text-xs text-gray-500 font-mono">otavio@fedoralinux:~</div>
-						</div>
-
+				ref={terminalBoxRef}
+				initial={{ opacity: 0, y: 50, scale: 0.95 }}
+				whileInView={{ opacity: 1, y: 0, scale: 1 }}
+				transition={{ duration: 0.8, delay: 0.2 }}
+				className="flex-1 w-full max-w-lg"
+			>
+				<AnimatePresence mode="wait">
+					{isTerminalOpen ? (
+						<motion.div
+							key="terminal"
+							initial={{ scale: 0.8, opacity: 0, y: 20 }}
+							animate={{ scale: 1, opacity: 1, y: 0 }}
+							exit={{ scale: 0.8, opacity: 0, y: -20 }}
+							transition={{ 
+								type: "spring",
+								stiffness: 300,
+								damping: 25
+							}}
+							className="w-full rounded-xl overflow-hidden bg-[#0c0c0c] border border-white/10 shadow-2xl shadow-emerald-900/10"
+						>
+							<div className="flex items-center gap-2 px-4 py-3 bg-[#1a1a1a] border-b border-white/5">
+								<button 
+									onClick={() => setIsTerminalOpen(false)}
+									className="w-3 h-3 rounded-full bg-red-500/80 hover:bg-red-500 transition-colors cursor-pointer"
+									aria-label="Close terminal"
+								/>
+								<div className="w-3 h-3 rounded-full bg-yellow-500/80" />
+								<div className="w-3 h-3 rounded-full bg-emerald-500/80" />
+								<div className="ml-auto text-xs text-gray-500 font-mono">otavio@fedoralinux:~</div>
+							</div>
 						<div 
 							ref={terminalRef}
 							className="p-6 font-mono text-sm md:text-base h-100 overflow-y-auto custom-scrollbar bg-[#0c0c0c]"
@@ -399,10 +438,46 @@ export default function TerminalSection() {
 								</>
 							)}
 						</div>
-					</div>
-				</motion.div>
+					</motion.div>
+				) : (
+					<motion.button
+						key="icon"
+						onClick={reopenTerminal}
+						className="w-24 h-24 rounded-2xl bg-[#0c0c0c] border border-white/10 shadow-2xl shadow-emerald-900/10 flex flex-col items-center justify-center gap-2 hover:border-emerald-500/30 transition-all cursor-pointer group"
+						initial={{ scale: 0, rotate: -180, opacity: 0 }}
+						animate={{ scale: 1, rotate: 0, opacity: 1 }}
+						exit={{ scale: 0, rotate: 180, opacity: 0 }}
+						transition={{ 
+							type: "spring",
+							stiffness: 260,
+							damping: 20,
+							duration: 0.6
+						}}
+						whileHover={{ scale: 1.1 }}
+						whileTap={{ scale: 0.95 }}
+					>
+						<div className="w-12 h-12 rounded-xl bg-emerald-500/10 flex items-center justify-center group-hover:bg-emerald-500/20 transition-colors">
+							<svg
+								xmlns="http://www.w3.org/2000/svg"
+								className="w-6 h-6 text-emerald-400"
+								viewBox="0 0 24 24"
+								fill="none"
+								stroke="currentColor"
+								strokeWidth="2"
+								strokeLinecap="round"
+								strokeLinejoin="round"
+							>
+								<polyline points="4 17 10 11 4 5"></polyline>
+								<line x1="12" y1="19" x2="20" y2="19"></line>
+							</svg>
+						</div>
+						<span className="text-emerald-400 font-mono text-xs">Terminal</span>
+					</motion.button>
+				)}
+				</AnimatePresence>
+			</motion.div>
 
-			</div>
+		</div>
 		</section>
 	);
 }
