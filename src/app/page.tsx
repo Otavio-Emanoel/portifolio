@@ -4,6 +4,7 @@ import Intro from "../components/Intro";
 import HeroWrapper from "../components/HeroWrapper";
 import TerminalSection from "../components/TerminalSection";
 import GitTimeline from "../components/GitTimeline";
+import SystemModules from "../components/SystemModules";
 
 export default function Home() {
   const [showIntro, setShowIntro] = useState(true);
@@ -31,6 +32,7 @@ export default function Home() {
       <HeroWrapper />
       <TerminalSection />
       <GitTimeline />
+      <SystemModules />
     </div>
   );
 }
