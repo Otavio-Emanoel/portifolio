@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import Intro from "../components/Intro";
 import HeroWrapper from "../components/HeroWrapper";
 import TerminalSection from "../components/TerminalSection";
+import GitTimeline from "../components/GitTimeline";
 
 export default function Home() {
   const [showIntro, setShowIntro] = useState(true);
@@ -29,6 +30,7 @@ export default function Home() {
       {showIntro && <Intro onDone={() => setShowIntro(false)} />}
       <HeroWrapper />
       <TerminalSection />
+      <GitTimeline />
     </div>
   );
 }
