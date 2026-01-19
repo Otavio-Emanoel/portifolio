@@ -14,28 +14,18 @@ const ScrambleText = ({ text, className }: { text: string; className?: string })
         text
           .split("")
           .map((letter, index) => {
-            if (index < iteration) {
-              return text[index];
-            }
+            if (index < iteration) return text[index];
             return chars[Math.floor(Math.random() * chars.length)];
           })
           .join("")
       );
-
-      if (iteration >= text.length) {
-        clearInterval(interval);
-      }
-
+      if (iteration >= text.length) clearInterval(interval);
       iteration += 1 / 3;
     }, 30);
   };
 
   return (
-    <motion.div 
-      className={className} 
-      onMouseEnter={scramble}
-      style={{ cursor: "text" }}
-    >
+    <motion.div className={className} onMouseEnter={scramble} style={{ cursor: "text" }}>
       {displayText}
     </motion.div>
   );
@@ -63,6 +53,66 @@ const WavingBrazilFlag = () => (
     <div className="absolute left-0 top-0 bottom-0 w-1 bg-black/20 blur-[1px]" />
   </motion.div>
 );
+
+const InfiniteMarquee = () => {
+  const [isHovered, setIsHovered] = useState(false);
+
+  const MarqueeContent = () => (
+    <div className="flex items-center gap-16 pr-16">
+      <span className="text-[18vw] leading-none tracking-tighter font-bold">OTAVIO EMANOEL</span>
+      <span className="text-[8vw] text-gray-400">★</span>
+      <span className="text-[18vw] leading-none tracking-tighter font-bold">OTAVIO EMANOEL</span>
+      <span className="text-[8vw] text-gray-400">★</span>
+    </div>
+  );
+
+  return (
+    <div 
+      className="pointer-events-auto relative flex overflow-hidden select-none pb-4"
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+    >
+      <div className="absolute left-0 top-0 bottom-0 w-32 bg-linear-to-r from-[#8f9294] to-transparent z-10" />
+      <div className="absolute right-0 top-0 bottom-0 w-32 bg-linear-to-l from-[#8f9294] to-transparent z-10" />
+
+      <motion.div
+        className="flex shrink-0"
+        initial={{ x: 0 }}
+        animate={{ x: "-100%" }}
+        transition={{ 
+          duration: isHovered ? 60 : 25,
+          repeat: Infinity, 
+          ease: "linear" 
+        }}
+      >
+        <div 
+            className={`flex items-center transition-all duration-500 ${isHovered ? "text-white drop-shadow-[0_0_15px_rgba(255,255,255,0.5)]" : "text-transparent"}`}
+            style={{ WebkitTextStroke: isHovered ? "0px" : "1px rgba(255,255,255,0.4)" }}
+        >
+          <MarqueeContent />
+        </div>
+      </motion.div>
+
+      <motion.div
+        className="flex shrink-0"
+        initial={{ x: 0 }}
+        animate={{ x: "-100%" }}
+        transition={{ 
+          duration: isHovered ? 60 : 25, 
+          repeat: Infinity, 
+          ease: "linear" 
+        }}
+      >
+        <div 
+            className={`flex items-center transition-all duration-500 ${isHovered ? "text-white drop-shadow-[0_0_15px_rgba(255,255,255,0.5)]" : "text-transparent"}`}
+            style={{ WebkitTextStroke: isHovered ? "0px" : "1px rgba(255,255,255,0.4)" }}
+        >
+          <MarqueeContent />
+        </div>
+      </motion.div>
+    </div>
+  );
+};
 
 export default function Hero() {
   const [isHovered, setIsHovered] = useState(false);
@@ -102,17 +152,10 @@ export default function Hero() {
     setIsHovered(false);
     setRipples([]);
     mouseXMotion.set(0);
-    console.log("Badge hover OFF");
   };
 
-  const handleBadgeMouseEnter = () => {
-    setIsHovered(true);
-    console.log("Badge hover ON");
-  };
-
-  const handleBadgeClick = () => {
-    console.log("Badge clicked");
-  };
+  const handleBadgeMouseEnter = () => setIsHovered(true);
+  const handleBadgeClick = () => {};
 
   const handleTextMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
     const rect = e.currentTarget.getBoundingClientRect();
@@ -279,16 +322,8 @@ export default function Hero() {
         </div>
       </motion.div>
 
-      <div className="pointer-events-none absolute bottom-0 left-0 right-0 select-none overflow-hidden opacity-30 mix-blend-overlay">
-        <motion.div
-          className="whitespace-nowrap"
-          initial={{ x: 0 }}
-          animate={{ x: "-100%" }}
-          transition={{ duration: 25, repeat: Infinity, ease: "linear" }}
-        >
-          <span className="inline-block px-8 text-[22vw] leading-none tracking-tight text-white/50 font-bold">Otavio Emanoel </span>
-          <span className="inline-block px-8 text-[22vw] leading-none tracking-tight text-white/50 font-bold">Otavio Emanoel </span>
-        </motion.div>
+      <div className="absolute bottom-0 left-0 right-0 z-20">
+         <InfiniteMarquee />
       </div>
     </section>
   );
