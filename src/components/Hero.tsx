@@ -3,15 +3,13 @@ import Image from "next/image";
 import { motion, AnimatePresence, useSpring, useMotionValue, useTransform } from "framer-motion";
 import { useState, useRef, useEffect } from "react";
 
-// --- Componente da Bandeira (Maior e com animação interna de vento) ---
 const WavingBrazilFlag = () => (
   <motion.div
-    // AUMENTEI O TAMANHO AQUI (h-16 w-24) 👇
     className="h-16 w-24 shadow-2xl"
-    style={{ transformOrigin: "left center" }} // A bandeira "segura" pelo lado esquerdo
+    style={{ transformOrigin: "left center" }} 
     animate={{
-      skewY: [0, 3, -3, 0], // Deformação do tecido
-      filter: ["brightness(1)", "brightness(1.15)", "brightness(0.9)", "brightness(1)"], // Luz nas dobras
+      skewY: [0, 3, -3, 0], 
+      filter: ["brightness(1)", "brightness(1.15)", "brightness(0.9)", "brightness(1)"], 
     }}
     transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
   >
@@ -24,7 +22,6 @@ const WavingBrazilFlag = () => (
       <circle cx="340" cy="230" r="3" fill="#fff" />
       <circle cx="400" cy="240" r="3" fill="#fff" />
     </svg>
-    {/* Haste da bandeira sutil (opcional, dá realismo) */}
     <div className="absolute left-0 top-0 bottom-0 w-1 bg-black/20 blur-[1px]" />
   </motion.div>
 );
@@ -33,12 +30,9 @@ export default function Hero() {
   const [isHovered, setIsHovered] = useState(false);
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
   
-  // Variáveis para a física da bandeira (Drag/Inércia)
   const mouseXMotion = useMotionValue(0);
-  const mouseXVelocity = useSpring(mouseXMotion, { stiffness: 500, damping: 30 }); // Suaviza o movimento
+  const mouseXVelocity = useSpring(mouseXMotion, { stiffness: 500, damping: 30 });   
   
-  // Transforma a velocidade do mouse em rotação da bandeira
-  // Se mover rápido pra direita, inclina pra esquerda (efeito de vento contrário)
   const flagTilt = useTransform(mouseXVelocity, [-1000, 1000], [45, -45]);
 
   const [ripples, setRipples] = useState<{ x: number; y: number; id: number }[]>([]);
@@ -52,12 +46,11 @@ export default function Hero() {
     
     setMousePos({ x, y });
 
-    // Calcula a "velocidade" baseada na diferença da posição X
-    const velocity = (e.clientX - prevMouseX.current) * 5; // Multiplicador para sensibilidade
+    const velocity = (e.clientX - prevMouseX.current) * 5; 
     mouseXMotion.set(velocity);
     prevMouseX.current = e.clientX;
 
-    // Lógica das ondas (Ripples)
+    
     const now = Date.now();
     if (now - lastRippleTime.current > 40) {
       const newRipple = { x, y, id: now };
@@ -69,7 +62,7 @@ export default function Hero() {
   const handleMouseLeave = () => {
     setIsHovered(false);
     setRipples([]);
-    mouseXMotion.set(0); // Zera a inércia da bandeira
+    mouseXMotion.set(0); 
   };
 
   return (
@@ -85,9 +78,7 @@ export default function Hero() {
       {/* --- BADGE PRINCIPAL --- */}
       <div className="absolute left-0 top-75 pl-2 z-30" style={{ perspective: 1000 }}>
         <motion.div
-          className="group relative flex cursor-pointer items-center gap-4 px-5 py-3.5"
-          // NOTA: Removi o overflow-hidden DAQUI para a bandeira poder sair
-          // E removi o background daqui também, ele vai para o container interno
+          className="group relative flex cursor-pointer items-center gap-4 px-5 py-3.5"  
           style={{ transformStyle: "preserve-3d" }}
           onMouseMove={handleMouseMove}
           onMouseEnter={() => setIsHovered(true)}
@@ -95,10 +86,6 @@ export default function Hero() {
           whileHover={{ scale: 1.02, rotateX: 5, rotateY: 5 }}
           whileTap={{ scale: 0.98 }}
         >
-          {/* CONTAINER "VIDRO" INTERNO 
-            Aqui fica o overflow-hidden para cortar a água e o brilho, 
-            mas não cortar a bandeira que está fora dele.
-          */}
           <div 
             className="absolute inset-0 rounded-3xl overflow-hidden pointer-events-none"
             style={{
@@ -108,7 +95,6 @@ export default function Hero() {
                 backdropFilter: "blur(10px)",
             }}
           >
-             {/* CAMADA DE LUZ (Spotlight) */}
             <motion.div
                 className="absolute -inset-px opacity-0"
                 animate={{ opacity: isHovered ? 1 : 0 }}
@@ -118,8 +104,6 @@ export default function Hero() {
                 mixBlendMode: "overlay",
                 }}
             />
-
-            {/* CAMADA DE ONDAS (Ripples) */}
             <AnimatePresence>
                 {ripples.map((ripple) => (
                 <motion.div
@@ -138,13 +122,9 @@ export default function Hero() {
                 />
                 ))}
             </AnimatePresence>
-            
-            {/* Noise Texture e Brilho Geral */}
             <div className="absolute inset-0 bg-white/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
           </div>
 
-
-          {/* --- BANDEIRA (FORA DO CONTAINER DE VIDRO) --- */}
           <AnimatePresence>
             {isHovered && (
               <motion.div
@@ -153,20 +133,20 @@ export default function Hero() {
                 animate={{ 
                   opacity: 1, 
                   scale: 1, 
-                  x: mousePos.x - 40, // Centralizando a bandeira maior
+                  x: mousePos.x - 40, 
                   y: mousePos.y - 40 
                 }}
                 exit={{ opacity: 0, scale: 0.5, transition: { duration: 0.15 } }}
-                // Aqui aplicamos a física de "tilt" baseada no movimento
+                
                 style={{ 
                     rotate: flagTilt, 
-                    filter: "drop-shadow(0 15px 15px rgba(0,0,0,0.5))" // Sombra fora do vidro
+                    filter: "drop-shadow(0 15px 15px rgba(0,0,0,0.5))" 
                 }}
                 transition={{ 
                     type: "spring", 
                     stiffness: 400, 
                     damping: 20,
-                    // Mass deixa o movimento da bandeira um pouco mais "pesado"
+                    
                     mass: 0.8 
                 }}
               >
@@ -175,7 +155,6 @@ export default function Hero() {
             )}
           </AnimatePresence>
 
-          {/* CONTEÚDO DE TEXTO (Mantido igual) */}
           <div className="relative z-10 leading-tight text-white/90 ml-1">
             <div className="text-xs font-light tracking-wide opacity-80 mix-blend-plus-lighter">Located in</div>
             <div className="text-sm font-semibold drop-shadow-md">Brazil</div>
@@ -197,7 +176,6 @@ export default function Hero() {
         </motion.div>
       </div>
 
-      {/* FOTO E RESTO DO SITE */}
       <div className="pointer-events-none absolute inset-0 -top-8 flex items-start justify-center pt-8">
         <div className="relative w-full max-w-5xl">
           <div className="relative mx-auto" style={{ height: "100vh" }}>
