@@ -42,6 +42,26 @@ const directories: Directory = {
 		{ name: "ecommerce-api", isFolder: true, color: "text-blue-400" },
 		{ name: "mobile-app", isFolder: true, color: "text-blue-400" },
 	],
+	"~/projects/portfolio": [
+		{ name: "README.md", isFolder: false, color: "text-gray-300" },
+		{ name: "package.json", isFolder: false, color: "text-gray-300" },
+		{ name: "src", isFolder: true, color: "text-blue-400" },
+	],
+	"~/projects/chat-app": [
+		{ name: "README.md", isFolder: false, color: "text-gray-300" },
+		{ name: "package.json", isFolder: false, color: "text-gray-300" },
+		{ name: "server.js", isFolder: false, color: "text-gray-300" },
+	],
+	"~/projects/ecommerce-api": [
+		{ name: "README.md", isFolder: false, color: "text-gray-300" },
+		{ name: "main.go", isFolder: false, color: "text-gray-300" },
+		{ name: "routes", isFolder: true, color: "text-blue-400" },
+	],
+	"~/projects/mobile-app": [
+		{ name: "README.md", isFolder: false, color: "text-gray-300" },
+		{ name: "pubspec.yaml", isFolder: false, color: "text-gray-300" },
+		{ name: "lib", isFolder: true, color: "text-blue-400" },
+	],
 };
 
 export default function TerminalSection() {
@@ -75,7 +95,75 @@ export default function TerminalSection() {
 			e.preventDefault();
 			processCommand(input);
 			setInput('');
+		} else if (e.key === 'Tab') {
+			e.preventDefault();
+			
+			const trimmedInput = input.trim();
+			const parts = trimmedInput.split(' ');
+			
+			// Se tem só um comando, autocomplete nomes de arquivos/pastas
+			if (parts.length === 1) {
+				const matches = getAutocompletes(parts[0]);
+				if (matches.length === 1) {
+					setInput(matches[0]);
+				} else if (matches.length > 1) {
+					// Mostrar matches
+					const matchesForDisplay: FileItem[] = matches.map(name => {
+						const file = getFilesInDir(currentDir).find(f => f.name === name);
+						return file || { name, isFolder: false, color: 'text-gray-300' };
+					});
+					setOutput(prev => [...prev, ...matchesForDisplay]);
+				}
+			} else if (parts.length === 2) {
+				// Para comandos como 'cat' ou 'cd'
+				const cmd = parts[0];
+				const partial = parts[1];
+				const matches = getAutocompletes(partial);
+				
+				if (matches.length === 1) {
+					setInput(`${cmd} ${matches[0]}`);
+				} else if (matches.length > 1) {
+					const matchesForDisplay: FileItem[] = matches.map(name => {
+						const file = getFilesInDir(currentDir).find(f => f.name === name);
+						return file || { name, isFolder: false, color: 'text-gray-300' };
+					});
+					setOutput(prev => [...prev, ...matchesForDisplay]);
+				}
+			}
 		}
+	};
+
+	const getFilesInDir = (dir: string) => {
+		return directories[dir] || [];
+	};
+
+	const fileExists = (filename: string, dir: string = currentDir): boolean => {
+		const files = getFilesInDir(dir);
+		return files.some(file => file.name === filename);
+	};
+
+	const dirExists = (dirname: string): boolean => {
+		if (dirname === '..') return true;
+		const filesInCurrentDir = getFilesInDir(currentDir);
+		return filesInCurrentDir.some(file => file.isFolder && file.name === dirname);
+	};
+
+	const getFullPath = (dirname: string): string => {
+		if (dirname === '..') {
+			// Volta um diretório
+			const parts = currentDir.split('/');
+			parts.pop();
+			return parts.length === 0 ? '~' : parts.join('/');
+		}
+		// Caminho relativo - concatena com o diretório atual
+		return currentDir === '~' ? `~/${dirname}` : `${currentDir}/${dirname}`;
+	};
+
+	const getAutocompletes = (prefix: string): string[] => {
+		const files = getFilesInDir(currentDir);
+		return files
+			.filter(file => file.name.startsWith(prefix))
+			.map(file => file.name);
 	};
 
 	const processCommand = (command: string) => {
@@ -90,28 +178,36 @@ export default function TerminalSection() {
 		const args = parts.slice(1).join(' ');
 
 		if (cmd === 'ls') {
-			const filesInDir = directories[currentDir] || [];
+			const filesInDir = getFilesInDir(currentDir);
 			setOutput(prev => [...prev, ...filesInDir]);
 		} else if (cmd === 'cd') {
-			if (args === 'projects') {
-				setCurrentDir('~/projects');
-				setOutput(prev => [...prev, '']);
-			} else if (args === '..') {
-				setCurrentDir('~');
+			if (!args) {
+				setOutput(prev => [...prev, `cd: missing directory operand`]);
+			} else if (dirExists(args)) {
+				const newPath = getFullPath(args);
+				setCurrentDir(newPath);
 				setOutput(prev => [...prev, '']);
 			} else {
 				setOutput(prev => [...prev, `cd: ${args}: No such file or directory`]);
 			}
-		} else if (cmd === 'cat' && args === 'about_me.txt') {
-			setOutput(prev => [...prev, 
-				'Passionate about creating scalable systems and fluid interfaces.',
-				'Currently focused on software architecture and mobile development.',
-				'Always seeking the next logical challenge.'
-			]);
+		} else if (cmd === 'cat') {
+			if (!args) {
+				setOutput(prev => [...prev, `cat: missing file operand`]);
+			} else if (args === 'about_me.txt') {
+				setOutput(prev => [...prev, 
+					'Passionate about creating scalable systems and fluid interfaces.',
+					'Currently focused on software architecture and mobile development.',
+					'Always seeking the next logical challenge.'
+				]);
+			} else if (fileExists(args, currentDir)) {
+				setOutput(prev => [...prev, `cat: cannot open file '${args}': Permission denied`]);
+			} else {
+				setOutput(prev => [...prev, `cat: ${args}: No such file or directory`]);
+			}
 		} else if (cmd === 'nyancat') {
 			setOutput(prev => [...prev, 'Nyan Nyan Nyan! 🐱']);
 		} else {
-			setOutput(prev => [...prev, `Command not found: ${cmd}`]);
+			setOutput(prev => [...prev, `command not found: ${cmd}`]);
 		}
 	};
 
@@ -208,7 +304,7 @@ export default function TerminalSection() {
 												initial={{ opacity: 0, x: -10 }}
 												animate={{ opacity: 1, x: 0 }}
 												transition={{ delay: index * 0.05 }}
-												className={`${item.startsWith('Command not found') || item.includes('No such file or directory') ? 'text-red-400' : item === '' ? 'mb-2' : 'text-gray-300'}`}
+												className={`${item.startsWith('command not found') || item.includes('No such file or directory') || item.startsWith('cat:') || item.startsWith('cd:') ? 'text-red-400' : item === '' ? 'mb-2' : 'text-gray-300'}`}
 											>
 												{item && item}
 											</motion.div>
@@ -239,7 +335,7 @@ export default function TerminalSection() {
 									onChange={(e) => setInput(e.target.value)}
 									onKeyDown={handleInput}
 									className="flex-1 bg-transparent outline-none text-gray-300 caret-emerald-400"
-									placeholder="$ "
+								placeholder="Type a command (Tab for autocomplete)..."
 									autoFocus
 								/>
 							</div>
