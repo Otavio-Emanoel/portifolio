@@ -44,9 +44,21 @@ export default function Intro({ onDone }: IntroProps) {
 
   return (
     <motion.div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-[#1a1a1a] text-zinc-50 overflow-hidden"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-[#1a1a1a] text-zinc-50 overflow-hidden p-4"
+      initial={{ borderRadius: "0px" }}
       variants={{
-        wipe: { y: [0, -40, -1000], opacity: [1, 1, 0], transition: { duration: 1.1, ease: [0.22, 1, 0.36, 1] } },
+        wipe: {
+          borderRadius: ["0px", "400px"],
+          scale: [1, 0.92],
+          y: [-200, -1200],
+          opacity: [1, 1, 0],
+          filter: ["blur(0px)", "blur(8px)"],
+          transition: { 
+            duration: 1.2, 
+            ease: [0.25, 0.46, 0.45, 0.94],
+            times: [0, 0.7, 1],
+          },
+        },
       }}
       animate={controls}
     >
@@ -69,7 +81,7 @@ export default function Intro({ onDone }: IntroProps) {
             )}
           </div>
 
-          {/* Progress bar appears after typing */}
+          {/* Loading text appears after typing */}
           {isTypingDone && (
             <motion.p
               initial={{ opacity: 0 }}
