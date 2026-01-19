@@ -72,7 +72,9 @@ export default function TerminalSection() {
 	const [input, setInput] = useState('');
 	const [output, setOutput] = useState<(string | FileItem)[]>([]);
 	const [currentDir, setCurrentDir] = useState('~');
+	const [isNyanCat, setIsNyanCat] = useState(false);
 	const terminalRef = useRef<HTMLDivElement>(null);
+	const inputRef = useRef<HTMLInputElement>(null);
 
 	useEffect(() => {
 		if (isInView && visibleLines < lines.length) {
@@ -89,6 +91,24 @@ export default function TerminalSection() {
 			terminalRef.current.scrollTop = terminalRef.current.scrollHeight;
 		}
 	}, [output]);
+
+	// Detectar Ctrl+C para sair do nyancat
+	useEffect(() => {
+		if (!isNyanCat) return;
+
+		const handleKeyDown = (e: KeyboardEvent) => {
+			if (e.ctrlKey && e.key === 'c') {
+				e.preventDefault();
+				setIsNyanCat(false);
+				setOutput(prev => [...prev, '']);
+				// Focus no input após sair do nyancat
+				setTimeout(() => inputRef.current?.focus(), 0);
+			}
+		};
+
+		window.addEventListener('keydown', handleKeyDown);
+		return () => window.removeEventListener('keydown', handleKeyDown);
+	}, [isNyanCat]);
 
 	const handleInput = (e: React.KeyboardEvent<HTMLInputElement>) => {
 		if (e.key === 'Enter') {
@@ -205,11 +225,41 @@ export default function TerminalSection() {
 				setOutput(prev => [...prev, `cat: ${args}: No such file or directory`]);
 			}
 		} else if (cmd === 'nyancat') {
-			setOutput(prev => [...prev, 'Nyan Nyan Nyan! 🐱']);
+			setOutput(prev => [...prev, `$ nyancat`, '']);
+			setIsNyanCat(true);
 		} else {
 			setOutput(prev => [...prev, `command not found: ${cmd}`]);
 		}
 	};
+
+	// Componente Nyancat com GIF
+	const NyanCatAnimation = () => (
+		<div className="w-full h-full relative bg-black">
+			{/* GIF do Nyancat - ocupando toda a área */}
+			<motion.img
+				src="/nyancat.gif"
+				alt="Nyancat"
+				className="w-full h-full object-cover"
+				initial={{ opacity: 0 }}
+				animate={{ opacity: 1 }}
+				transition={{ duration: 0.5 }}
+			/>
+
+			{/* Text */}
+			<motion.div
+				className="text-emerald-400 text-sm font-mono absolute bottom-4 left-1/2 transform -translate-x-1/2"
+				animate={{
+					opacity: [0.5, 1],
+				}}
+				transition={{
+					duration: 1,
+					repeat: Infinity,
+				}}
+			>
+				Press Ctrl+C to exit nyancat
+			</motion.div>
+		</div>
+	);
 
 	return (
 		<section id="about" className="relative min-h-screen flex items-center justify-center bg-[#111] py-20 px-4">
@@ -263,40 +313,44 @@ export default function TerminalSection() {
 
 						<div 
 							ref={terminalRef}
-							className="p-6 font-mono text-sm md:text-base h-100 overflow-y-auto custom-scrollbar"
+							className="p-6 font-mono text-sm md:text-base h-100 overflow-y-auto custom-scrollbar bg-[#0c0c0c]"
 							tabIndex={0}
 						>
-							{lines.map((line, index) => (
-								<motion.div
-									key={index}
-									initial={{ opacity: 0, x: -10 }}
-									animate={{ 
-										opacity: index < visibleLines ? 1 : 0, 
-										x: index < visibleLines ? 0 : -10 
-									}}
-									className={`mb-2 ${index >= visibleLines ? "hidden" : "block"}`}
-								>
-									{line.type === "command" ? (
-										<span className="flex gap-2">
-											<span className="text-pink-500 font-bold">➜</span>
-											<span className="text-blue-400 font-bold">~</span>
-											<span className={line.color}>{line.text}</span>
-										</span>
-									) : line.type === "cursor" ? (
-										 <span className={line.color}>{line.text}</span>
-									) : line.label ? (
-										<div className="flex gap-3">
-											<span className="text-emerald-400 font-bold min-w-17.5">{line.label}</span>
-											<span className={line.color}>{line.text}</span>
-										</div>
-									) : (
-										<span className={line.color}>{line.text}</span>
-									)}
-								</motion.div>
-							))}
-							<div className="mt-4">
-								{output.map((item, index) => {
-									// Se for um string (comando ou mensagem)
+							{isNyanCat ? (
+								<NyanCatAnimation />
+							) : (
+								<>
+									{lines.map((line, index) => (
+										<motion.div
+											key={index}
+											initial={{ opacity: 0, x: -10 }}
+											animate={{ 
+												opacity: index < visibleLines ? 1 : 0, 
+												x: index < visibleLines ? 0 : -10 
+											}}
+											className={`mb-2 ${index >= visibleLines ? "hidden" : "block"}`}
+										>
+											{line.type === "command" ? (
+												<span className="flex gap-2">
+													<span className="text-pink-500 font-bold">➜</span>
+													<span className="text-blue-400 font-bold">~</span>
+													<span className={line.color}>{line.text}</span>
+												</span>
+											) : line.type === "cursor" ? (
+												 <span className={line.color}>{line.text}</span>
+											) : line.label ? (
+												<div className="flex gap-3">
+													<span className="text-emerald-400 font-bold min-w-17.5">{line.label}</span>
+													<span className={line.color}>{line.text}</span>
+												</div>
+											) : (
+												<span className={line.color}>{line.text}</span>
+											)}
+										</motion.div>
+									))}
+									<div className="mt-4">
+										{output.map((item, index) => {
+											// Se for um string (comando ou mensagem)
 									if (typeof item === 'string') {
 										return (
 											<motion.div 
@@ -326,19 +380,24 @@ export default function TerminalSection() {
 									);
 								})}
 							</div>
-							<div className="flex gap-2 mt-2">
-								<span className="text-pink-500 font-bold">➜</span>
-								<span className="text-blue-400 font-bold">{currentDir}</span>
-								<input 
-									type="text"
-									value={input}
-									onChange={(e) => setInput(e.target.value)}
-									onKeyDown={handleInput}
-									className="flex-1 bg-transparent outline-none text-gray-300 caret-emerald-400"
-								placeholder="Type a command (Tab for autocomplete)..."
-									autoFocus
-								/>
-							</div>
+							{!isNyanCat && (
+								<div className="flex gap-2 mt-2">
+									<span className="text-pink-500 font-bold">➜</span>
+									<span className="text-blue-400 font-bold">{currentDir}</span>
+									<input 
+										ref={inputRef}
+										type="text"
+										value={input}
+										onChange={(e) => setInput(e.target.value)}
+										onKeyDown={handleInput}
+										className="flex-1 bg-transparent outline-none text-gray-300 caret-emerald-400"
+										placeholder="Type a command (Tab for autocomplete)..."
+										autoFocus
+									/>
+								</div>
+							)}
+								</>
+							)}
 						</div>
 					</div>
 				</motion.div>
