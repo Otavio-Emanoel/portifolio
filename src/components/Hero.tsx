@@ -60,9 +60,9 @@ const InfiniteMarquee = () => {
   const MarqueeContent = () => (
     <div className="flex items-center gap-16 pr-16">
       <span className="text-[18vw] leading-none tracking-tighter font-bold">OTAVIO EMANOEL</span>
-      <span className="text-[8vw] text-gray-400">★</span>
+      <span className="text-[8vw] ">★</span>
       <span className="text-[18vw] leading-none tracking-tighter font-bold">OTAVIO EMANOEL</span>
-      <span className="text-[8vw] text-gray-400">★</span>
+      <span className="text-[8vw] ">★</span>
     </div>
   );
 
