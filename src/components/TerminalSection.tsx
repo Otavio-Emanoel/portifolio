@@ -6,17 +6,17 @@ const lines = [
   { text: "> neofetch --user otavio", color: "text-emerald-400", type: "command" },
   { text: "loading system info...", color: "text-gray-500", type: "output" },
   { text: "----------------------", color: "text-gray-600", type: "output" },
-  { label: "OS:", text: "Arch Linux (BTW)", color: "text-white" },
+  { label: "OS:", text: "Fedora + Arch Linux", color: "text-white" },
   { label: "Host:", text: "Etec de Peruíbe", color: "text-white" },
   { label: "Role:", text: "Full-Stack Developer", color: "text-white" },
   { label: "Uptime:", text: "17 years", color: "text-white" },
   { label: "Goal:", text: "Exchange Program 2026 ✈️", color: "text-yellow-300" },
-  { label: "Stack:", text: "Go, TypeScript, React Native, Node.js", color: "text-blue-400" },
+  { label: "Stack:", text: "TypeScript, Java, Dart, Python, C#, Go", color: "text-blue-400" },
   { text: "", type: "break" },
   { text: "> cat about_me.txt", color: "text-emerald-400", type: "command" },
-  { text: "Apaixonado por criar sistemas escaláveis e interfaces fluidas.", color: "text-gray-300", type: "output" },
-  { text: "Atualmente focado em arquitetura de software e desenvolvimento mobile.", color: "text-gray-300", type: "output" },
-  { text: "Sempre buscando o próximo desafio lógico.", color: "text-gray-300", type: "output" },
+  { text: "Passionate about creating scalable systems and fluid interfaces.", color: "text-gray-300", type: "output" },
+  { text: "Currently focused on software architecture and mobile development.", color: "text-gray-300", type: "output" },
+  { text: "Always seeking the next logical challenge.", color: "text-gray-300", type: "output" },
   { text: "", type: "break" },
   { text: "> _", color: "text-emerald-400 animate-pulse", type: "cursor" },
 ];
@@ -49,23 +49,23 @@ export default function TerminalSection() {
           className="flex-1 text-left"
         >
           <h2 className="text-4xl md:text-6xl font-bold text-white mb-6 leading-tight">
-            Codando o futuro, <br />
+            Coding the future, <br />
             <span className="text-transparent bg-clip-text bg-linear-to-r from-emerald-400 to-blue-500">
-              uma linha de cada vez.
+              one line at a time.
             </span>
           </h2>
           <p className="text-gray-400 text-lg leading-relaxed max-w-md">
-            Mais do que apenas escrever código, eu construo soluções. Do backend em <strong>Go</strong> à interface em <strong>React</strong>, meu foco é performance e experiência do usuário.
+            More than write code. From backend in <strong>NodeJS</strong> and <strong>Spring Boot</strong> to interface in <strong>NextJS</strong> and <strong>React Native</strong>, my focus is on performance and user experience.
           </p>
           
           <div className="mt-8 flex gap-6">
             <div className="flex flex-col">
               <span className="text-3xl font-bold text-white">3+</span>
-              <span className="text-sm text-gray-500">Anos de Estudo</span>
+              <span className="text-sm text-gray-500">Years of Study</span>
             </div>
             <div className="flex flex-col">
               <span className="text-3xl font-bold text-white">15+</span>
-              <span className="text-sm text-gray-500">Projetos Criados</span>
+              <span className="text-sm text-gray-500">Projects Created</span>
             </div>
           </div>
         </motion.div>
@@ -82,7 +82,7 @@ export default function TerminalSection() {
               <div className="w-3 h-3 rounded-full bg-red-500/80" />
               <div className="w-3 h-3 rounded-full bg-yellow-500/80" />
               <div className="w-3 h-3 rounded-full bg-emerald-500/80" />
-              <div className="ml-auto text-xs text-gray-500 font-mono">otavio@archlinux:~</div>
+              <div className="ml-auto text-xs text-gray-500 font-mono">otavio@fedoralinux:~</div>
             </div>
 
             <div className="p-6 font-mono text-sm md:text-base h-100 overflow-y-auto custom-scrollbar">

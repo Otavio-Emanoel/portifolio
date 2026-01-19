@@ -24,3 +24,45 @@ body {
   color: var(--foreground);
   font-family: var(--font-poppins);
 }
+
+/* --- SCROLLBAR DO TERMINAL (Efeito Hacker) --- */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 8px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: #0c0c0c;
+  border-left: 1px solid #333;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: #333;
+  border-radius: 0;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #34d399;
+  cursor: grab;
+}
+
+/* --- SCROLLBAR DO SITE (Global) --- */
+html.lenis, html.lenis body {
+  height: auto;
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #111;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #444;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #666;
+}

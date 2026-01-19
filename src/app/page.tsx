@@ -13,6 +13,17 @@ export default function Home() {
     return () => clearTimeout(t);
   }, [showIntro]);
 
+  useEffect(() => {
+    if (showIntro) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [showIntro]);
+
   return (
     <div className="min-h-screen bg-zinc-200 font-sans dark:bg-zinc-900">
       {showIntro && <Intro onDone={() => setShowIntro(false)} />}
