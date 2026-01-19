@@ -10,7 +10,7 @@ const initialLines = [
 	{ label: "Host:", text: "Etec de Peruíbe", color: "text-white" },
 	{ label: "Role:", text: "Full-Stack Developer", color: "text-white" },
 	{ label: "Uptime:", text: "17 years", color: "text-white" },
-	{ label: "Goal:", text: "Exchange Program 2026 ✈️", color: "text-yellow-300" },
+	{ label: "Goal:", text: "Be a great developer", color: "text-yellow-300" },
 	{ label: "Stack:", text: "TypeScript, Java, Dart, Python, C#, Go", color: "text-blue-400" },
 	{ text: "", type: "break" },
 	{ text: "> cat about_me.txt", color: "text-emerald-400", type: "command" },
@@ -234,6 +234,32 @@ export default function TerminalSection() {
 			} else {
 				setOutput(prev => [...prev, `cat: ${args}: No such file or directory`]);
 			}
+		} else if (cmd === 'neofetch') {
+			// Parse username from --user flag
+			let username = 'otavio';
+			const userFlagIndex = parts.indexOf('--user');
+			if (userFlagIndex !== -1 && parts[userFlagIndex + 1]) {
+				username = parts[userFlagIndex + 1];
+			}
+			
+			setOutput(prev => [...prev,
+				'loading system info...',
+				'----------------------',
+			]);
+			
+			// Adiciona as informações formatadas como no initialLines
+			setTimeout(() => {
+				setOutput(prev => [
+					...prev,
+					{ label: 'OS:', text: 'Fedora + Arch Linux', color: 'text-white' } as any,
+					{ label: 'Host:', text: 'Etec de Peruíbe', color: 'text-white' } as any,
+					{ label: 'Role:', text: 'Full-Stack Developer', color: 'text-white' } as any,
+					{ label: 'Uptime:', text: '17 years', color: 'text-white' } as any,
+					{ label: 'Goal:', text: 'Be a great developer', color: 'text-yellow-300' } as any,
+					{ label: 'Stack:', text: 'TypeScript, Java, Dart, Python, C#, Go', color: 'text-blue-400' } as any,
+					''
+				]);
+			}, 300);
 		} else if (cmd === 'nyancat') {
 			setOutput(prev => [...prev, `$ nyancat`, '']);
 			setIsNyanCat(true);
@@ -405,18 +431,40 @@ export default function TerminalSection() {
 									}
 									
 									// Se for um objeto FileItem (arquivo ou pasta)
-									const fileItem = item as FileItem;
-									return (
-										<motion.div 
-											key={index}
-											initial={{ opacity: 0, x: -10 }}
-											animate={{ opacity: 1, x: 0 }}
-											transition={{ delay: index * 0.05 }}
-											className={fileItem.color}
-										>
-											{fileItem.isFolder ? `📁 ${fileItem.name}` : `📄 ${fileItem.name}`}
-										</motion.div>
-									);
+									if ('isFolder' in item) {
+										const fileItem = item as FileItem;
+										return (
+											<motion.div 
+												key={index}
+												initial={{ opacity: 0, x: -10 }}
+												animate={{ opacity: 1, x: 0 }}
+												transition={{ delay: index * 0.05 }}
+												className={fileItem.color}
+											>
+												{fileItem.isFolder ? `📁 ${fileItem.name}` : `📄 ${fileItem.name}`}
+											</motion.div>
+										);
+									}
+									
+									// Se for um objeto com label (neofetch)
+									if ('label' in item) {
+										const labelItem = item as { label: string; text: string; color: string };
+										return (
+											<motion.div 
+												key={index}
+												initial={{ opacity: 0, x: -10 }}
+												animate={{ opacity: 1, x: 0 }}
+												transition={{ delay: index * 0.05 }}
+												className="flex gap-3"
+											>
+												<span className="text-emerald-400 font-bold min-w-20">{labelItem.label}</span>
+												<span className={labelItem.color}>{labelItem.text}</span>
+											</motion.div>
+										);
+									}
+									
+									// Fallback para qualquer outro tipo
+									return null;
 								})}
 							</div>
 							{!isNyanCat && (
