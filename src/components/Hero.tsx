@@ -3,6 +3,44 @@ import Image from "next/image";
 import { motion, AnimatePresence, useSpring, useMotionValue, useTransform } from "framer-motion";
 import { useState, useRef, useEffect } from "react";
 
+const ScrambleText = ({ text, className }: { text: string; className?: string }) => {
+  const [displayText, setDisplayText] = useState(text);
+  const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+-=[]{}|;:,.<>?";
+
+  const scramble = () => {
+    let iteration = 0;
+    const interval = setInterval(() => {
+      setDisplayText((prev) =>
+        text
+          .split("")
+          .map((letter, index) => {
+            if (index < iteration) {
+              return text[index];
+            }
+            return chars[Math.floor(Math.random() * chars.length)];
+          })
+          .join("")
+      );
+
+      if (iteration >= text.length) {
+        clearInterval(interval);
+      }
+
+      iteration += 1 / 3;
+    }, 30);
+  };
+
+  return (
+    <motion.div 
+      className={className} 
+      onMouseEnter={scramble}
+      style={{ cursor: "text" }}
+    >
+      {displayText}
+    </motion.div>
+  );
+};
+
 const WavingBrazilFlag = () => (
   <motion.div
     className="h-16 w-24 shadow-2xl"
@@ -29,27 +67,28 @@ const WavingBrazilFlag = () => (
 export default function Hero() {
   const [isHovered, setIsHovered] = useState(false);
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
-  
   const mouseXMotion = useMotionValue(0);
   const mouseXVelocity = useSpring(mouseXMotion, { stiffness: 500, damping: 30 });   
-  
   const flagTilt = useTransform(mouseXVelocity, [-1000, 1000], [45, -45]);
-
   const [ripples, setRipples] = useState<{ x: number; y: number; id: number }[]>([]);
   const lastRippleTime = useRef(0);
   const prevMouseX = useRef(0);
 
-  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+  const textRef = useRef<HTMLDivElement>(null);
+  const textX = useMotionValue(0);
+  const textY = useMotionValue(0);
+  const springTextX = useSpring(textX, { stiffness: 200, damping: 15 });
+  const springTextY = useSpring(textY, { stiffness: 200, damping: 15 });
+
+  const handleBadgeMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
     const rect = e.currentTarget.getBoundingClientRect();
     const x = e.clientX - rect.left;
     const y = e.clientY - rect.top;
     
     setMousePos({ x, y });
-
     const velocity = (e.clientX - prevMouseX.current) * 5; 
     mouseXMotion.set(velocity);
     prevMouseX.current = e.clientX;
-
     
     const now = Date.now();
     if (now - lastRippleTime.current > 40) {
@@ -59,15 +98,37 @@ export default function Hero() {
     }
   };
 
-  const handleMouseLeave = () => {
+  const handleBadgeMouseLeave = () => {
     setIsHovered(false);
     setRipples([]);
-    mouseXMotion.set(0); 
+    mouseXMotion.set(0);
+    console.log("Badge hover OFF");
+  };
+
+  const handleBadgeMouseEnter = () => {
+    setIsHovered(true);
+    console.log("Badge hover ON");
+  };
+
+  const handleBadgeClick = () => {
+    console.log("Badge clicked");
+  };
+
+  const handleTextMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    const centerX = rect.left + rect.width / 2;
+    const centerY = rect.top + rect.height / 2;
+    textX.set((e.clientX - centerX) / 5);
+    textY.set((e.clientY - centerY) / 5);
+  };
+
+  const handleTextMouseLeave = () => {
+    textX.set(0);
+    textY.set(0);
   };
 
   return (
     <section className="relative min-h-screen overflow-hidden bg-[#8f9294]">
-      {/* Top markers */}
       <div className="pointer-events-none absolute left-6 top-6 text-sm text-white/80">© Otavio Emanoel de Lima</div>
       <nav className="absolute right-8 top-6 flex gap-8 text-sm text-white/80 z-50">
         <a href="#work" className="hover:text-white transition-colors">Work</a>
@@ -75,14 +136,14 @@ export default function Hero() {
         <a href="#contact" className="hover:text-white transition-colors">Contact</a>
       </nav>
 
-      {/* --- BADGE PRINCIPAL --- */}
       <div className="absolute left-0 top-75 pl-2 z-30" style={{ perspective: 1000 }}>
         <motion.div
           className="group relative flex cursor-pointer items-center gap-4 px-5 py-3.5"  
           style={{ transformStyle: "preserve-3d" }}
-          onMouseMove={handleMouseMove}
-          onMouseEnter={() => setIsHovered(true)}
-          onMouseLeave={handleMouseLeave}
+          onMouseMove={handleBadgeMouseMove}
+          onMouseEnter={handleBadgeMouseEnter}
+          onMouseLeave={handleBadgeMouseLeave}
+          onClick={handleBadgeClick}
           whileHover={{ scale: 1.02, rotateX: 5, rotateY: 5 }}
           whileTap={{ scale: 0.98 }}
         >
@@ -113,12 +174,7 @@ export default function Hero() {
                     exit={{ opacity: 0 }}
                     transition={{ duration: 1.2, ease: "easeOut" }}
                     className="absolute rounded-full border border-white/40 bg-white/10 shadow-[0_0_15px_rgba(255,255,255,0.2)]"
-                    style={{
-                    width: 20,
-                    height: 20,
-                    top: -10,
-                    left: -10,
-                    }}
+                    style={{ width: 20, height: 20, top: -10, left: -10 }}
                 />
                 ))}
             </AnimatePresence>
@@ -137,18 +193,8 @@ export default function Hero() {
                   y: mousePos.y - 40 
                 }}
                 exit={{ opacity: 0, scale: 0.5, transition: { duration: 0.15 } }}
-                
-                style={{ 
-                    rotate: flagTilt, 
-                    filter: "drop-shadow(0 15px 15px rgba(0,0,0,0.5))" 
-                }}
-                transition={{ 
-                    type: "spring", 
-                    stiffness: 400, 
-                    damping: 20,
-                    
-                    mass: 0.8 
-                }}
+                style={{ rotate: flagTilt, filter: "drop-shadow(0 15px 15px rgba(0,0,0,0.5))" }}
+                transition={{ type: "spring", stiffness: 400, damping: 20, mass: 0.8 }}
               >
                 <WavingBrazilFlag />
               </motion.div>
@@ -193,21 +239,43 @@ export default function Hero() {
       </div>
 
       <motion.div
-        className="absolute right-12 top-32 text-right text-white md:right-24 z-10"
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
+        ref={textRef}
+        className="absolute right-12 top-32 text-right text-white md:right-24 z-10 cursor-default"
+        initial={{ opacity: 0, x: 50 }}
+        animate={{ opacity: 1, x: 0 }}
         transition={{ duration: 0.8, delay: 0.5 }}
+        onMouseMove={handleTextMouseMove}
+        onMouseLeave={handleTextMouseLeave}
+        style={{ x: springTextX, y: springTextY }}
       >
         <motion.div
-          className="mb-4 text-6xl font-light inline-block"
-          animate={{ x: [0, 5, 0], y: [0, 5, 0] }}
+          className="mb-6 flex justify-end"
+          animate={{ y: [0, -10, 0] }}
           transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
         >
-          ↘
+          <motion.div 
+            className="flex h-16 w-16 items-center justify-center rounded-full border border-white/20 bg-white/5 backdrop-blur-sm"
+            whileHover={{ scale: 1.1, backgroundColor: "rgba(255,255,255,0.1)" }}
+          >
+             <span className="text-4xl text-white/80">↘</span>
+          </motion.div>
         </motion.div>
-        <div className="text-5xl font-light leading-tight">
-          <div>Freelance</div>
-          <div>Backend Developer</div>
+
+        <div className="space-y-2">
+           <div className="text-5xl font-light leading-tight">
+             <ScrambleText text="Freelance" className="hover:text-emerald-300 transition-colors duration-300" />
+           </div>
+           
+           <div className="text-5xl font-light leading-tight">
+             <ScrambleText text="Backend Developer" className="font-medium" />
+           </div>
+           
+           <motion.div 
+              className="mt-4 h-0.5 bg-white/30 ml-auto"
+              style={{ width: "20%" }}
+              whileHover={{ width: "100%", backgroundColor: "#fff" }}
+              transition={{ duration: 0.4 }}
+           />
         </div>
       </motion.div>
 
