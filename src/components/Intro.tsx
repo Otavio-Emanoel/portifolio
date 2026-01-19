@@ -1,50 +1,86 @@
 "use client";
 import { motion, useAnimationControls } from "framer-motion";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 interface IntroProps {
   onDone?: () => void;
 }
 
+const text = "Hello! My name is Otavio and I am a fullstack developer";
+
 export default function Intro({ onDone }: IntroProps) {
   const controls = useAnimationControls();
+  const [displayedText, setDisplayedText] = useState("");
+  const [isTypingDone, setIsTypingDone] = useState(false);
 
   useEffect(() => {
-    const run = async () => {
-      await controls.start("enter");
-      await controls.start("progress");
-      await controls.start("wipe");
-      onDone?.();
-    };
-    run();
-  }, [controls, onDone]);
+    let index = 0;
+    const interval = setInterval(() => {
+      index++;
+      if (index <= text.length) {
+        setDisplayedText(text.substring(0, index));
+      }
+      if (index > text.length) {
+        clearInterval(interval);
+        setIsTypingDone(true);
+      }
+    }, 50);
+
+    return () => clearInterval(interval);
+  }, []);
+
+  useEffect(() => {
+    if (isTypingDone) {
+      const timeout = setTimeout(() => {
+        const run = async () => {
+          await controls.start("wipe");
+          onDone?.();
+        };
+        run();
+      }, 5500);
+      return () => clearTimeout(timeout);
+    }
+  }, [isTypingDone, controls, onDone]);
 
   return (
     <motion.div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-zinc-900 text-zinc-50"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-[#1a1a1a] text-zinc-50 overflow-hidden"
       variants={{
-        enter: { opacity: [0, 1], transition: { duration: 0.3 } },
-        progress: { opacity: 1 },
         wipe: { y: [0, -40, -1000], opacity: [1, 1, 0], transition: { duration: 1.1, ease: [0.22, 1, 0.36, 1] } },
       }}
       animate={controls}
     >
-      <div className="flex flex-col items-center gap-4">
+      <div className="flex flex-col items-center gap-6 px-6 max-w-2xl mx-auto">
         <motion.div
-          initial={{ scale: 0.9, opacity: 0 }}
-          animate={{ scale: [0.9, 1.05, 1], opacity: [0, 1], rotate: [0, 3, 0] }}
-          transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
-          className="rounded-full bg-zinc-800/70 px-6 py-3 text-lg tracking-wide"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.5 }}
+          className="text-center"
         >
-          Bem-vindo
+          {/* Typing text with code font */}
+          <div className="text-lg sm:text-xl font-mono leading-relaxed tracking-tight text-zinc-100 h-24 flex items-center justify-center">
+            <span>{displayedText}</span>
+            {!isTypingDone && (
+              <motion.span
+                animate={{ opacity: [1, 0] }}
+                transition={{ duration: 0.5, repeat: Infinity }}
+                className="ml-1 inline-block w-2 h-6 sm:h-8 bg-zinc-100"
+              />
+            )}
+          </div>
+
+          {/* Progress bar appears after typing */}
+          {isTypingDone && (
+            <motion.p
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.5 }}
+              className="text-xs sm:text-sm text-zinc-400"
+            >
+              Loading...
+            </motion.p>
+          )}
         </motion.div>
-        <motion.div
-          initial={{ width: 0 }}
-          animate={{ width: 200 }}
-          transition={{ duration: 0.8, delay: 0.25, ease: "easeOut" }}
-          className="h-1 rounded-full bg-linear-to-r from-zinc-500 via-zinc-200 to-white"
-        />
-        <p className="text-sm text-zinc-400">Carregando portfólio...</p>
       </div>
     </motion.div>
   );

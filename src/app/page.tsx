@@ -7,10 +7,12 @@ export default function Home() {
   const [showIntro, setShowIntro] = useState(true);
 
   useEffect(() => {
-    // Fallback para esconder intro após timeout, caso onDone não dispare
-    const t = setTimeout(() => setShowIntro(false), 2500);
+    // Failsafe: só esconde a intro se por algum motivo o onDone não disparar.
+    // Precisa ser maior que o tempo de digitação + tempo de espera + animação de saída.
+    if (!showIntro) return;
+    const t = setTimeout(() => setShowIntro(false), 20000);
     return () => clearTimeout(t);
-  }, []);
+  }, [showIntro]);
 
   return (
     <div className="min-h-screen bg-zinc-200 font-sans dark:bg-zinc-900">
