@@ -223,7 +223,7 @@ export default function Hero() {
   };
 
   return (
-    <section className="relative min-h-screen overflow-hidden bg-[#8f9294]">
+    <section className="relative min-h-screen overflow-hidden bg-[#8f9294] select-none">
       <motion.div className="pointer-events-none absolute left-6 top-6 text-sm text-white/80" initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 9.6 }}>© Otavio Emanoel de Lima</motion.div>
       <motion.nav className="absolute right-8 top-6 flex gap-8 text-sm text-white/80 z-50" initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 9.6 }}>
         <a href="#work" className="hover:text-white transition-colors">Work</a>
