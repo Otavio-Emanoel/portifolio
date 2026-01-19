@@ -11,13 +11,10 @@ const ScrambleText = ({ text, className }: { text: string; className?: string })
     let iteration = 0;
     const interval = setInterval(() => {
       setDisplayText((prev) =>
-        text
-          .split("")
-          .map((letter, index) => {
-            if (index < iteration) return text[index];
-            return chars[Math.floor(Math.random() * chars.length)];
-          })
-          .join("")
+        text.split("").map((letter, index) => {
+          if (index < iteration) return text[index];
+          return chars[Math.floor(Math.random() * chars.length)];
+        }).join("")
       );
       if (iteration >= text.length) clearInterval(interval);
       iteration += 1 / 3;
@@ -60,9 +57,9 @@ const InfiniteMarquee = () => {
   const MarqueeContent = () => (
     <div className="flex items-center gap-16 pr-16">
       <span className="text-[18vw] leading-none tracking-tighter font-bold">OTAVIO EMANOEL</span>
-      <span className="text-[8vw] ">★</span>
+      <span className="text-[8vw]">★</span>
       <span className="text-[18vw] leading-none tracking-tighter font-bold">OTAVIO EMANOEL</span>
-      <span className="text-[8vw] ">★</span>
+      <span className="text-[8vw]">★</span>
     </div>
   );
 
@@ -172,14 +169,33 @@ export default function Hero() {
 
   return (
     <section className="relative min-h-screen overflow-hidden bg-[#8f9294]">
-      <div className="pointer-events-none absolute left-6 top-6 text-sm text-white/80">© Otavio Emanoel de Lima</div>
-      <nav className="absolute right-8 top-6 flex gap-8 text-sm text-white/80 z-50">
+      <motion.div 
+        className="pointer-events-none absolute left-6 top-6 text-sm text-white/80"
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6, delay: 9.6, ease: "easeOut" }}
+      >
+        © Otavio Emanoel de Lima
+      </motion.div>
+
+      <motion.nav 
+        className="absolute right-8 top-6 flex gap-8 text-sm text-white/80 z-50"
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6, delay: 9.6, ease: "easeOut" }}
+      >
         <a href="#work" className="hover:text-white transition-colors">Work</a>
         <a href="#about" className="hover:text-white transition-colors">About</a>
         <a href="#contact" className="hover:text-white transition-colors">Contact</a>
-      </nav>
+      </motion.nav>
 
-      <div className="absolute left-0 top-75 pl-2 z-30" style={{ perspective: 1000 }}>
+      <motion.div 
+        className="absolute left-0 top-75 pl-2 z-30" 
+        style={{ perspective: 1000 }}
+        initial={{ opacity: 0, x: -50 }}
+        animate={{ opacity: 1, x: 0 }}
+        transition={{ duration: 0.8, delay: 9.4, ease: "easeOut" }}
+      >
         <motion.div
           className="group relative flex cursor-pointer items-center gap-4 px-5 py-3.5"  
           style={{ transformStyle: "preserve-3d" }}
@@ -263,9 +279,14 @@ export default function Hero() {
             <div className="absolute inset-0 bg-linear-to-tr from-white/20 to-transparent rounded-full" />
           </motion.div>
         </motion.div>
-      </div>
+      </motion.div>
 
-      <div className="pointer-events-none absolute inset-0 -top-8 flex items-start justify-center pt-8">
+      <motion.div 
+        className="pointer-events-none absolute inset-0 -top-8 flex items-start justify-center pt-8"
+        initial={{ opacity: 0, scale: 0.9, filter: "blur(10px)" }}
+        animate={{ opacity: 1, scale: 1, filter: "blur(0px)" }}
+        transition={{ duration: 1.2, delay: 9.2, ease: [0.22, 1, 0.36, 1] }}
+      >
         <div className="relative w-full max-w-5xl">
           <div className="relative mx-auto" style={{ height: "100vh" }}>
             <Image
@@ -279,14 +300,14 @@ export default function Hero() {
             />
           </div>
         </div>
-      </div>
+      </motion.div>
 
       <motion.div
         ref={textRef}
         className="absolute right-12 top-32 text-right text-white md:right-24 z-10 cursor-default"
-        initial={{ opacity: 0, x: 50 }}
+        initial={{ opacity: 0, x: 80 }}
         animate={{ opacity: 1, x: 0 }}
-        transition={{ duration: 0.8, delay: 0.5 }}
+        transition={{ duration: 0.8, delay: 9.4, ease: "easeOut" }}
         onMouseMove={handleTextMouseMove}
         onMouseLeave={handleTextMouseLeave}
         style={{ x: springTextX, y: springTextY }}
@@ -322,9 +343,14 @@ export default function Hero() {
         </div>
       </motion.div>
 
-      <div className="absolute bottom-0 left-0 right-0 z-20">
+      <motion.div 
+        className="absolute bottom-0 left-0 right-0 z-20"
+        initial={{ opacity: 0, y: 100 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 1, delay: 9.8, ease: "easeOut" }}
+      >
          <InfiniteMarquee />
-      </div>
+      </motion.div>
     </section>
   );
 }
