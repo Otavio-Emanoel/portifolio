@@ -88,14 +88,14 @@ export default function TerminalSection() {
 		}
 	}, [isTerminalInView, isTerminalOpen, visibleLines, lines.length]);
 
-	// Auto-scroll quando há novo output
+	
 	useEffect(() => {
 		if (terminalRef.current) {
 			terminalRef.current.scrollTop = terminalRef.current.scrollHeight;
 		}
 	}, [output]);
 
-	// Detectar Ctrl+C para sair do nyancat
+	
 	useEffect(() => {
 		if (!isNyanCat) return;
 
@@ -104,7 +104,7 @@ export default function TerminalSection() {
 				e.preventDefault();
 				setIsNyanCat(false);
 				setOutput(prev => [...prev, '']);
-				// Focus no input após sair do nyancat
+				
 				setTimeout(() => inputRef.current?.focus(), 0);
 			}
 		};
@@ -114,7 +114,7 @@ export default function TerminalSection() {
 	}, [isNyanCat]);
 
 	const handleInput = (e: React.KeyboardEvent<HTMLInputElement>) => {
-		// Detectar Ctrl+D para fechar terminal
+		
 		if (e.ctrlKey && e.key === 'd') {
 			e.preventDefault();
 			setIsTerminalOpen(false);
@@ -131,13 +131,13 @@ export default function TerminalSection() {
 			const trimmedInput = input.trim();
 			const parts = trimmedInput.split(' ');
 			
-			// Se tem só um comando, autocomplete nomes de arquivos/pastas
+			
 			if (parts.length === 1) {
 				const matches = getAutocompletes(parts[0]);
 				if (matches.length === 1) {
 					setInput(matches[0]);
 				} else if (matches.length > 1) {
-					// Mostrar matches
+					
 					const matchesForDisplay: FileItem[] = matches.map(name => {
 						const file = getFilesInDir(currentDir).find(f => f.name === name);
 						return file || { name, isFolder: false, color: 'text-gray-300' };
@@ -145,7 +145,7 @@ export default function TerminalSection() {
 					setOutput(prev => [...prev, ...matchesForDisplay]);
 				}
 			} else if (parts.length === 2) {
-				// Para comandos como 'cat' ou 'cd'
+				
 				const cmd = parts[0];
 				const partial = parts[1];
 				const matches = getAutocompletes(partial);
@@ -180,12 +180,12 @@ export default function TerminalSection() {
 
 	const getFullPath = (dirname: string): string => {
 		if (dirname === '..') {
-			// Volta um diretório
+			
 			const parts = currentDir.split('/');
 			parts.pop();
 			return parts.length === 0 ? '~' : parts.join('/');
 		}
-		// Caminho relativo - concatena com o diretório atual
+		
 		return currentDir === '~' ? `~/${dirname}` : `${currentDir}/${dirname}`;
 	};
 
@@ -199,7 +199,7 @@ export default function TerminalSection() {
 	const processCommand = (command: string) => {
 		if (!command.trim()) return;
 
-		// Adiciona o comando ao output
+		
 		setOutput(prev => [...prev, `$ ${command}`]);
 
 		const trimmedCommand = command.trim();
@@ -235,7 +235,7 @@ export default function TerminalSection() {
 				setOutput(prev => [...prev, `cat: ${args}: No such file or directory`]);
 			}
 		} else if (cmd === 'neofetch') {
-			// Parse username from --user flag
+			
 			let username = 'otavio';
 			const userFlagIndex = parts.indexOf('--user');
 			if (userFlagIndex !== -1 && parts[userFlagIndex + 1]) {
@@ -247,7 +247,7 @@ export default function TerminalSection() {
 				'----------------------',
 			]);
 			
-			// Adiciona as informações formatadas como no initialLines
+			
 			setTimeout(() => {
 				setOutput(prev => [
 					...prev,
@@ -270,18 +270,18 @@ export default function TerminalSection() {
 		}
 	};
 
-	// Função para reabrir o terminal
+	
 	const reopenTerminal = () => {
 		setIsTerminalOpen(true);
 		setVisibleLines(0);
 		setOutput([]);
 		setCurrentDir('~');
 		setIsNyanCat(false);
-		// Focus no input após reabrir
+		
 		setTimeout(() => inputRef.current?.focus(), 100);
 	};
 
-	// Componente Nyancat com GIF
+	
 	const NyanCatAnimation = () => (
 		<div className="w-full h-full relative bg-black">
 			{/* GIF do Nyancat - ocupando toda a área */}
@@ -415,7 +415,7 @@ export default function TerminalSection() {
 									))}
 									<div className="mt-4">
 										{output.map((item, index) => {
-											// Se for um string (comando ou mensagem)
+											
 									if (typeof item === 'string') {
 										return (
 											<motion.div 
@@ -430,7 +430,7 @@ export default function TerminalSection() {
 										);
 									}
 									
-									// Se for um objeto FileItem (arquivo ou pasta)
+									
 									if ('isFolder' in item) {
 										const fileItem = item as FileItem;
 										return (
@@ -446,7 +446,7 @@ export default function TerminalSection() {
 										);
 									}
 									
-									// Se for um objeto com label (neofetch)
+									
 									if ('label' in item) {
 										const labelItem = item as { label: string; text: string; color: string };
 										return (
@@ -462,8 +462,7 @@ export default function TerminalSection() {
 											</motion.div>
 										);
 									}
-									
-									// Fallback para qualquer outro tipo
+
 									return null;
 								})}
 							</div>
