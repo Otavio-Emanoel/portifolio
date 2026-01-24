@@ -93,11 +93,11 @@ const MobileSocialButton = ({ icon: Icon, label, href }: { icon: any, label: str
 
 export default function HeroMobile() {
   return (
-    // max-w-[100vw] e overflow-x-hidden são CRUCIAIS aqui
-    <section className="relative w-full h-screen max-w-[100vw] overflow-x-hidden overflow-y-hidden bg-[#8f9294] flex flex-col justify-between">
+    // Garante que nada transborde para a direita
+    <section className="relative w-screen h-screen overflow-hidden bg-[#8f9294] flex flex-col justify-between">
       
       {/* 1. Header (Topo) */}
-      <div className="absolute top-0 left-0 right-0 z-40 flex items-center justify-between px-6 py-6 w-full">
+      <div className="absolute top-0 left-0 right-0 z-40 flex items-center justify-between px-6 py-6 w-screen">
         <motion.div 
           initial={{ opacity: 0, y: -20 }} 
           animate={{ opacity: 1, y: 0 }} 
@@ -133,7 +133,7 @@ export default function HeroMobile() {
 
       {/* 2. Conteúdo Principal (Texto e Botões) */}
       {/* Z-index alto para ficar acima da foto se necessário */}
-      <div className="relative z-30 px-6 pt-32 w-full flex flex-col items-end text-right">
+      <div className="relative z-30 px-6 pt-32 w-screen flex flex-col items-end text-right">
         
         {/* Seta Animada */}
         <motion.div 
@@ -187,7 +187,7 @@ export default function HeroMobile() {
         initial={{ opacity: 0, scale: 0.95, y: 50 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
         transition={{ duration: 1, delay: 0.2 }}
-        className="absolute bottom-0 left-0 right-0 z-10 w-full h-[65vh] flex items-end justify-center pointer-events-none"
+        className="absolute bottom-0 left-0 right-0 z-10 w-screen h-[65vh] flex items-end justify-center pointer-events-none overflow-hidden"
       >
         <div className="relative w-full h-full max-w-125">
           <Image
@@ -206,7 +206,7 @@ export default function HeroMobile() {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 1.5 }}
-        className="relative z-20 w-full pb-6"
+        className="relative z-20 w-screen pb-6 overflow-hidden"
       >
         <InfiniteMarqueeMobile />
       </motion.div>
