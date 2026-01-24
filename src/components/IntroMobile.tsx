@@ -72,7 +72,7 @@ export default function IntroMobile({ onDone }: IntroMobileProps) {
 
   return (
     <motion.div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-[#0B0F19] text-zinc-50 overflow-hidden p-4"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-[#0B0F19] text-zinc-50 overflow-hidden p-4 h-dvh"
       initial={{ borderRadius: "0px" }}
       variants={{
         wipe: {

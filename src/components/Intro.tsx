@@ -44,7 +44,7 @@ export default function Intro({ onDone }: IntroProps) {
 
   return (
     <motion.div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-[#1a1a1a] text-zinc-50 overflow-hidden p-4"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-[#1a1a1a] text-zinc-50 overflow-hidden p-4 h-dvh"
       initial={{ borderRadius: "0px" }}
       variants={{
         wipe: {

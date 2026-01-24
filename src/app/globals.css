@@ -9,6 +9,14 @@ html {
   --background: #ffffff;
   --foreground: #171717;
   --font-poppins: "Poppins", sans-serif;
+  /* Altura dinâmica que se adapta às barras do sistema */
+  --vh: 1vh;
+}
+
+@supports (height: 100dvh) {
+  :root {
+    --vh: 1dvh;
+  }
 }
 
 @theme inline {
@@ -73,3 +81,29 @@ html.lenis, html.lenis body {
 ::-webkit-scrollbar-thumb:hover {
   background: #666;
 }
+
+/* --- MARQUEE ANIMATION --- */
+@keyframes marquee {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+.animate-marquee {
+  display: flex;
+  white-space: nowrap;
+  gap: 1rem;
+  min-width: 200%;
+  will-change: transform;
+  animation: marquee 18s linear infinite;
+}
+
+.animate-marquee[aria-hidden="true"] {
+  position: absolute;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+  animation-delay: -9s;
+}
+
+/* Utility for dynamic viewport height (uses --vh variable set in :root) */
+.h-dvh { height: calc(var(--vh) * 100); }
